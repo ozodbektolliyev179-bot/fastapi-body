@@ -1,7 +1,10 @@
+from datetime import datetime
+
 from typing import Annotated, Optional, List
 from enum import Enum
-from datetime import date, datetime
-from pydantic import BaseModel, Field, HttpUrl 
+
+from pydantic import BaseModel, Field, HttpUrl
+
 
 class Data(BaseModel):
     a: float
@@ -26,14 +29,6 @@ class ProductCreate(BaseModel):
     stock: Annotated[int, Field(ge=1)]
     status: ProductStatus
     images: List[ProductImage]
-    # date: datetime
-
-    # @field_validator('date')
-    # @staticmethod
-    # def validate_date(cls, value: datetime):
-    #     if value < datetime(2024, 1, 1):
-    #         raise ValueError("datetime must be >= 2024-01-01")
-    #     return value
 
 
 class ProductUpdate(BaseModel):
@@ -44,30 +39,21 @@ class ProductUpdate(BaseModel):
     status: Optional[ProductStatus] = None
 
 
+class BookAuthor(BaseModel):
+    first_name: Annotated[str, Field(min_length=3)]
+    last_name: Annotated[str | None, Field(min_length=3)] = None
+    birth_date: datetime | None = None
 
 
-class AuthorSchema(BaseModel):
-    first_name: str
-    last_name: str
-    birth_date: date
-
-
-class ImageSchema(BaseModel):
-    name: str
+class BookImages(BaseModel):
+    name: Annotated[str, Field(min_length=3)]
     url: HttpUrl
 
 
-class BookCreateSchema(BaseModel):
-    title: str
-    description: str
-    isbn: int
+class BookCreate(BaseModel):
+    title: Annotated[str, Field(min_length=3)]
+    description: Optional[str] = None
+    isbn: Annotated[int, Field(gt=0)]
     published_date: datetime
-    author: AuthorSchema
-    images: List[ImageSchema]
-
-
-class BookResponseSchema(BookCreateSchema):
-    id: int
-
-    class Config:
-        from_attributes = True
+    author: BookAuthor
+    images: List[BookImages]
